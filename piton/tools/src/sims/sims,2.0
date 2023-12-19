@@ -1524,13 +1524,23 @@ sub generic_sim_build
       $build_cmd .= "$dv_root/tools/pli/iop/cpx.cc " ;
       $build_cmd .= "$dv_root/tools/pli/iop/pcx.cc " ;
       $build_cmd .= "--top-module cmp_top " ;
+      if ($opt{log_all}) {
+        $build_cmd .= "--trace " ;
+      }
       $build_cmd .= "-Wno-fatal " ;
       $build_cmd .= "-Wno-BLKANDNBLK " ;
       $build_cmd .= "-Wno-TIMESCALEMOD " ;
       $build_cmd .= "-DPITON_DPI " ;
+      if ($opt{log_all}) {
+        print("$prg: building a verilator executable that will dump all waves to a vcd file - this file can get very large so make sure you run this on a fast disk with enough space.\n");
+        $build_cmd .= "-DVERILATOR_VCD " ;
+      }
       $build_cmd .= "--unroll-count 256 " ;
       $build_cmd .= "-CFLAGS -DVERILATOR " ;
       $build_cmd .= "-CFLAGS -DPITON_DPI " ;
+      if ($opt{log_all}) {
+        $build_cmd .= "-CFLAGS -DVERILATOR_VCD " ;
+      }
       $build_cmd .= "-CFLAGS -lstdc++ " ;
       $build_cmd .= "-CFLAGS -I$dv_root/tools/pli/iop " ;
       $build_cmd .= "-CFLAGS -I$dv_root/tools/verilator " ;
@@ -2935,6 +2945,7 @@ OPENPITON ARGUMENTS
 
     -log_all
             in a msm_run, this command logs all signals and dumps them to the "all-waves.wlf" file for later inspection with a wave viewer.
+            in a vlt_build, this command logs all signals and dumps them to the "my_top.vcd" file.
 
     -slurm -sim_q_command=sbatch
             specifies simulations should be submitted with the Simple Linux
@@ -2983,7 +2994,7 @@ VERILOG COMPILATION RELATED
            builds a verilator model. defaults to off.
 
     -vlt_build_args=OPTION
-           modelsim compile options. multiple options can be specified using
+           verilator compile options. multiple options can be specified using
            multiple such arguments.
 
     -vcs_build/-novcs_build
